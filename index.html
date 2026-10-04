@@ -1,0 +1,249 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<link rel="preconnect" href="https://fonts.googleapis.com"><link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600&family=Montserrat:wght@600;700&display=swap" rel="stylesheet">
+<title>AI-Based Face Recognition Attendance System: Case Study</title>
+<style>
+:root{--navy:#16382f;--blue:#2a6b57;--teal:#c0801c;--ink:#1f2a25;--mute:#5f6b63;--line:#dde3dc;--bg:#f7f8f5;--card:#fff;--soft:#eef4ef}
+*{box-sizing:border-box}
+body{margin:0;font:16px/1.7 Inter,"Segoe UI",Arial,sans-serif;color:var(--ink);background:var(--bg)}
+h1,h2,h3,.sans,th,nav,.tag{font-family:Montserrat,Inter,Arial,sans-serif}
+header{background:var(--navy);color:#fff;padding:64px 24px 56px}
+.wrap{max-width:900px;margin:0 auto}
+header h1{font-size:2.3rem;line-height:1.2;margin:0 0 12px;font-weight:700}
+header p{margin:0;color:#cfe0d6;font-size:1.1rem;max-width:640px}
+.tags{margin-top:24px;display:flex;flex-wrap:wrap;gap:8px}
+.tag{background:rgba(255,255,255,.12);border:1px solid rgba(255,255,255,.25);padding:4px 12px;border-radius:99px;font-size:.85rem}
+nav{background:#fff;border-bottom:1px solid var(--line);position:sticky;top:0;z-index:5}
+nav .wrap{display:flex;gap:20px;overflow-x:auto;padding:12px 24px;font-size:.9rem}
+nav a{color:var(--blue);text-decoration:none;white-space:nowrap}
+nav a:hover,nav a:focus-visible{text-decoration:underline;outline:none}
+main{padding:24px}
+section{padding:36px 0;border-bottom:1px solid var(--line)}
+section:last-child{border:0}
+h2{color:var(--navy);font-size:1.6rem;margin:0 0 16px}
+h3{color:var(--blue);font-size:1.1rem;margin:24px 0 8px}
+p{margin:0 0 14px}
+.callout{background:var(--soft);border-left:4px solid var(--teal);padding:14px 18px;border-radius:0 6px 6px 0;margin:18px 0}
+.stats{display:grid;grid-template-columns:repeat(auto-fit,minmax(170px,1fr));gap:14px;margin:20px 0}
+.stat{background:var(--card);border:1px solid var(--line);border-top:3px solid var(--teal);padding:14px 16px;border-radius:6px}
+.stat b{display:block;font-family:Inter,Arial,sans-serif;color:var(--navy);font-size:1.05rem}
+.stat span{font-size:.9rem;color:var(--mute)}
+figure{margin:22px 0;background:var(--card);border:1px solid var(--line);border-radius:8px;padding:16px}
+figure svg{width:100%;height:auto;display:block}
+figcaption{font:.85rem Inter,Arial,sans-serif;color:var(--mute);margin-top:10px;text-align:center}
+.scroll{overflow-x:auto}
+table{width:100%;border-collapse:collapse;background:var(--card);font-size:.95rem;margin:12px 0}
+th{background:var(--navy);color:#fff;text-align:left;padding:10px 12px;font-size:.9rem}
+td{padding:10px 12px;border-bottom:1px solid var(--line);vertical-align:top}
+tr:nth-child(even) td{background:#fafbf8}
+.pass{color:#0b6b3a;font-weight:600}
+ul{padding-left:20px}li{margin-bottom:6px}
+.qa{display:grid;grid-template-columns:repeat(auto-fit,minmax(250px,1fr));gap:14px}
+.qa div{background:var(--card);border:1px solid var(--line);border-radius:6px;padding:14px 16px}
+.qa h3{margin-top:0}
+footer{background:var(--navy);color:#cfe0d6;text-align:center;padding:24px;font:.9rem Inter,Arial,sans-serif}
+@media(max-width:600px){header h1{font-size:1.7rem}}
+</style>
+</head>
+<body>
+<header><div class="wrap">
+<h1>AI-Based Face Recognition Attendance System</h1>
+<p>Automating attendance with computer vision and real-time face recognition</p>
+<div class="tags"><span class="tag">Python</span><span class="tag">OpenCV</span><span class="tag">LBPH</span><span class="tag">Flask</span><span class="tag">Prototype</span></div>
+</div></header>
+<nav><div class="wrap">
+<a href="#context">Context</a><a href="#challenge">Challenge</a><a href="#approach">Approach</a><a href="#solution">Solution</a><a href="#architecture">Architecture</a><a href="#tech">Tech Stack</a><a href="#testing">Testing</a><a href="#outcome">Outcome</a><a href="#questions">Interview Questions</a>
+</div></nav>
+<main><div class="wrap">
+ 
+<section id="context">
+<h2>The Context</h2>
+<p>Attendance is a routine process, but in classrooms and similar environments, recording it manually takes valuable time. Traditional methods such as roll calls and paper registers depend heavily on human involvement. This leads to missing entries, incorrect records, duplicate entries, and proxy attendance.</p>
+<p>We built an AI-based Face Recognition Attendance System to make this process automated and contactless. The system uses a webcam to capture faces, identifies registered students with a trained recognition model, and records their attendance digitally with the date and time.</p>
+<p>The project was developed as a prototype for controlled environments such as classrooms or offices. Its focus was to show how computer vision and machine learning can be applied to attendance management.</p>
+<div class="stats">
+<div class="stat"><b>Problem</b><span>Manual, error-prone, open to proxy attendance</span></div>
+<div class="stat"><b>Solution</b><span>Webcam-based, contactless recognition</span></div>
+<div class="stat"><b>Environment</b><span>Controlled: classrooms and offices</span></div>
+<div class="stat"><b>Output</b><span>Digital CSV record with date and time</span></div>
+</div>
+</section>
+ 
+<section id="challenge">
+<h2>The Challenge</h2>
+<p>The goal was not simply to detect a face. The system had to connect several steps into one reliable workflow:</p>
+<ul>
+<li>Collect and organize student facial data before recognition can take place.</li>
+<li>Detect faces from a live webcam feed and compare them with registered data.</li>
+<li>Identify the student and record attendance <b>without creating duplicate entries</b>.</li>
+<li>Keep running when no face is detected or an unregistered person appears, and never create an incorrect record.</li>
+</ul>
+<table>
+<tr><th>Situation</th><th>Required behaviour</th></tr>
+<tr><td>Registered student detected</td><td>Identify the student and mark attendance once</td></tr>
+<tr><td>Same student detected again</td><td>Do not create another record in the session</td></tr>
+<tr><td>Unknown face</td><td>Do not mark attendance; continue scanning</td></tr>
+<tr><td>No face in frame</td><td>Continue operating without error</td></tr>
+</table>
+</section>
+ 
+<section id="approach">
+<h2>Our Approach</h2>
+<p>We designed the system as a modular pipeline rather than treating attendance as a single operation. Separating <b>data collection, model training, recognition, and attendance management</b> makes each part easier to test and maintain.</p>
+<p>The workflow begins with student registration. The administrator enters the student's name and roll number, and the webcam captures multiple facial images. These are stored in folders named by roll number and form the training dataset. Once the dataset is ready, the system trains a recognition model. During attendance, the trained model is loaded to recognize students from the live feed.</p>
+</section>
+ 
+<section id="solution">
+<h2>The Solution</h2>
+<p>The system combines face detection, face recognition, attendance logic, and a simple web interface.</p>
+<table>
+<tr><th>Module</th><th>What it does</th></tr>
+<tr><td><b>Student Registration</b></td><td>Admin enters name and roll number. The webcam captures multiple images. Faces are detected before saving, and images are filed by roll number.</td></tr>
+<tr><td><b>Detection and Recognition</b></td><td>OpenCV detects faces and processes images. The Local Binary Pattern Histogram (LBPH) algorithm links facial images to roll numbers and creates a reusable trained model. Live frames are compared with this model.</td></tr>
+<tr><td><b>Attendance Management</b></td><td>On a successful match, the system records name, roll number, date, and time. It checks for duplicates and skips unrecognized faces.</td></tr>
+<tr><td><b>Web Interface</b></td><td>A Flask dashboard lets the administrator enter details, capture images, start training, and trigger attendance without touching backend code.</td></tr>
+</table>
+</section>
+ 
+<section id="architecture">
+<h2>How It Works</h2>
+<p>At a high level, the system follows this flow. During registration, images move from the webcam into the dataset. During attendance, live input is compared with the trained LBPH model, and recognized students are written to a CSV file.</p>
+<figure>
+<svg viewBox="0 0 880 150" role="img" aria-label="System pipeline from webcam to CSV record" font-family="Inter,Arial,sans-serif" font-size="13">
+<defs><marker id="a" markerWidth="8" markerHeight="8" refX="7" refY="4" orient="auto"><path d="M0,0 L8,4 L0,8 z" fill="#5f6b63"/></marker></defs>
+<g fill="#eef4ef" stroke="#2a6b57" stroke-width="1.5">
+<rect x="10" y="50" width="100" height="50" rx="6"/><rect x="135" y="50" width="100" height="50" rx="6"/>
+<rect x="260" y="50" width="110" height="50" rx="6" fill="#fff"/><rect x="395" y="50" width="100" height="50" rx="6"/>
+<rect x="520" y="50" width="105" height="50" rx="6"/><rect x="650" y="50" width="105" height="50" rx="6"/>
+<rect x="780" y="50" width="90" height="50" rx="6" fill="#16382f"/></g>
+<g text-anchor="middle" fill="#16382f" font-weight="600">
+<text x="60" y="80">Webcam</text><text x="185" y="73">Face</text><text x="185" y="90">Detection</text>
+<text x="315" y="73">Dataset /</text><text x="315" y="90">Trained Model</text>
+<text x="445" y="73">Face</text><text x="445" y="90">Recognition</text>
+<text x="572" y="73">Student</text><text x="572" y="90">Identified</text>
+<text x="702" y="73">Attendance</text><text x="702" y="90">Validation</text>
+<text x="825" y="80" fill="#fff">CSV Record</text></g>
+<g stroke="#5f6b63" stroke-width="1.5" marker-end="url(#a)">
+<line x1="110" y1="75" x2="133" y2="75"/><line x1="235" y1="75" x2="258" y2="75"/><line x1="370" y1="75" x2="393" y2="75"/>
+<line x1="495" y1="75" x2="518" y2="75"/><line x1="625" y1="75" x2="648" y2="75"/><line x1="755" y1="75" x2="778" y2="75"/></g>
+</svg>
+<figcaption>Figure 1: End-to-end processing pipeline</figcaption>
+</figure>
+ 
+<h3>Attendance sequence (UML)</h3>
+<figure>
+<svg viewBox="0 0 880 400" role="img" aria-label="UML sequence diagram of attendance marking" font-family="Inter,Arial,sans-serif" font-size="12">
+<defs><marker id="b" markerWidth="8" markerHeight="8" refX="7" refY="4" orient="auto"><path d="M0,0 L8,4 L0,8 z" fill="#16382f"/></marker></defs>
+<g fill="#16382f"><rect x="20" y="10" width="110" height="32" rx="4"/><rect x="190" y="10" width="110" height="32" rx="4"/><rect x="360" y="10" width="110" height="32" rx="4"/><rect x="530" y="10" width="110" height="32" rx="4"/><rect x="700" y="10" width="130" height="32" rx="4"/></g>
+<g fill="#fff" text-anchor="middle" font-weight="600"><text x="75" y="31">Admin</text><text x="245" y="31">Flask UI</text><text x="415" y="31">Face Detector</text><text x="585" y="31">LBPH Model</text><text x="765" y="31">Attendance Mgr</text></g>
+<g stroke="#a3b0a7" stroke-dasharray="5 4"><line x1="75" y1="42" x2="75" y2="390"/><line x1="245" y1="42" x2="245" y2="390"/><line x1="415" y1="42" x2="415" y2="390"/><line x1="585" y1="42" x2="585" y2="390"/><line x1="765" y1="42" x2="765" y2="390"/></g>
+<g stroke="#16382f" stroke-width="1.5" marker-end="url(#b)">
+<line x1="75" y1="75" x2="243" y2="75"/><line x1="245" y1="110" x2="413" y2="110"/><line x1="415" y1="145" x2="583" y2="145"/>
+<line x1="585" y1="190" x2="763" y2="190"/><line x1="765" y1="270" x2="247" y2="270" stroke-dasharray="5 3"/><line x1="245" y1="340" x2="77" y2="340" stroke-dasharray="5 3"/></g>
+<g fill="#1f2a25"><text x="90" y="68">Start attendance</text><text x="260" y="103">Capture live frame</text><text x="430" y="138">Detected face</text>
+<text x="600" y="183">Predicted roll number</text><text x="262" y="263">Marked / duplicate / skipped</text><text x="92" y="333">Show result</text></g>
+<rect x="600" y="205" width="260" height="50" rx="6" fill="#eef4ef" stroke="#c0801c"/>
+<g fill="#16382f"><text x="610" y="224" font-weight="600">alt: roll number found?</text><text x="610" y="242">no → ignore face; keep scanning</text></g>
+<rect x="520" y="285" width="340" height="40" rx="6" fill="#fff" stroke="#c0801c"/>
+<text x="530" y="302" fill="#16382f" font-weight="600">Check duplicate; if new, write name, roll no.,</text><text x="530" y="317" fill="#16382f" font-weight="600">date and time to CSV</text>
+</svg>
+<figcaption>Figure 2: Sequence of events when attendance is triggered</figcaption>
+</figure>
+ 
+<h3>Component structure (UML class diagram)</h3>
+<p>The architecture was organized around the camera, face detector, dataset manager, face recognizer, student, attendance manager, and file manager. The diagram below shows one reasonable way to relate them.</p>
+<figure>
+<svg viewBox="0 0 880 330" role="img" aria-label="UML class diagram of system components" font-family="Inter,Arial,sans-serif" font-size="12">
+<g fill="#fff" stroke="#2a6b57" stroke-width="1.5">
+<rect x="20" y="20" width="190" height="95"/><rect x="260" y="20" width="190" height="95"/><rect x="500" y="20" width="190" height="95"/><rect x="20" y="190" width="190" height="95"/><rect x="260" y="190" width="190" height="95"/><rect x="500" y="190" width="190" height="95"/><rect x="720" y="105" width="150" height="95"/></g>
+<g fill="#16382f"><rect x="20" y="20" width="190" height="26"/><rect x="260" y="20" width="190" height="26"/><rect x="500" y="20" width="190" height="26"/><rect x="20" y="190" width="190" height="26"/><rect x="260" y="190" width="190" height="26"/><rect x="500" y="190" width="190" height="26"/><rect x="720" y="105" width="150" height="26"/></g>
+<g fill="#fff" font-weight="600" text-anchor="middle"><text x="115" y="38">Camera</text><text x="355" y="38">FaceDetector</text><text x="595" y="38">DatasetManager</text><text x="115" y="208">FaceRecognizer</text><text x="355" y="208">AttendanceManager</text><text x="595" y="208">FileManager</text><text x="795" y="123">Student</text></g>
+<g fill="#1f2a25">
+<text x="30" y="68">+ capture_frame()</text><text x="30" y="88">+ release()</text>
+<text x="270" y="68">+ detect(frame)</text><text x="270" y="88">+ crop_face(frame)</text>
+<text x="510" y="68">+ save_images(roll_no)</text><text x="510" y="88">+ load_dataset()</text>
+<text x="30" y="238">+ train(dataset)</text><text x="30" y="258">+ predict(face)</text>
+<text x="270" y="238">+ mark(student)</text><text x="270" y="258">+ is_duplicate(roll_no)</text>
+<text x="510" y="238">+ append_row(record)</text><text x="510" y="258">+ read_records()</text>
+<text x="730" y="153">- name</text><text x="730" y="173">- roll_no</text></g>
+<g stroke="#5f6b63" stroke-width="1.5" fill="none">
+<line x1="210" y1="67" x2="260" y2="67"/><line x1="450" y1="67" x2="500" y2="67"/><line x1="595" y1="115" x2="595" y2="190" stroke-dasharray="5 3"/>
+<line x1="210" y1="237" x2="260" y2="237"/><line x1="450" y1="237" x2="500" y2="237"/><line x1="690" y1="150" x2="720" y2="150"/><line x1="355" y1="190" x2="355" y2="115" stroke-dasharray="5 3"/></g>
+<text x="440" y="318" fill="#5f6b63" text-anchor="middle">Solid line: uses / depends on. Dashed line: indirect data flow.</text>
+</svg>
+<figcaption>Figure 3: Illustrative class diagram of the main components</figcaption>
+</figure>
+</section>
+ 
+<section id="tech">
+<h2>Technical Details</h2>
+<p>The system uses a lightweight Python-based stack.</p>
+<div class="scroll"><table>
+<tr><th>Technology</th><th>Role in the project</th></tr>
+<tr><td>Python</td><td>Face recognition logic and backend processing</td></tr>
+<tr><td>OpenCV</td><td>Face detection and image processing</td></tr>
+<tr><td>LBPH</td><td>Face recognition algorithm</td></tr>
+<tr><td>NumPy</td><td>Numerical operations and image data handling</td></tr>
+<tr><td>Flask</td><td>Web interface and frontend-backend communication</td></tr>
+<tr><td>CSV files</td><td>Attendance record storage</td></tr>
+<tr><td>Webcam</td><td>Live facial image capture</td></tr>
+<tr><td>VS Code</td><td>Development environment</td></tr>
+</table></div>
+<div class="callout">The trained model is stored and reused, so the system does not retrain on every start. When new students are added, the model is retrained on the updated dataset.</div>
+</section>
+ 
+<section id="testing">
+<h2>Testing the System</h2>
+<p>Testing covered individual modules and the full workflow:</p>
+<ul>
+<li><b>Unit testing:</b> dataset creation, model training, and attendance modules.</li>
+<li><b>Integration testing:</b> captured data passes correctly into training, and the trained model works for attendance marking.</li>
+<li><b>System testing:</b> the complete process using a live webcam in real time.</li>
+</ul>
+<table>
+<tr><th>Test case</th><th>Result</th></tr>
+<tr><td>Dataset creation</td><td class="pass">Passed</td></tr>
+<tr><td>Model training and model-file generation</td><td class="pass">Passed</td></tr>
+<tr><td>Recognition of registered students</td><td class="pass">Passed</td></tr>
+<tr><td>Attendance recording with date and time</td><td class="pass">Passed</td></tr>
+<tr><td>Duplicate attendance prevention</td><td class="pass">Passed</td></tr>
+<tr><td>Handling of unknown faces</td><td class="pass">Passed</td></tr>
+</table>
+<p>All documented test cases passed. The system operated reliably under controlled conditions.</p>
+</section>
+ 
+<section id="outcome">
+<h2>The Outcome</h2>
+<p>The project showed how facial recognition can replace a largely manual attendance workflow with an automated, contactless process. The prototype brought together image collection, model training, real-time recognition, attendance validation, digital record keeping, and a browser-based interface in one system. Students do not need a manual register or a physical biometric device.</p>
+<h3>Limitations observed</h3>
+<table>
+<tr><th>Factor</th><th>Effect on the system</th></tr>
+<tr><td>Lighting conditions</td><td>Can reduce recognition accuracy</td></tr>
+<tr><td>Dataset quality</td><td>Poor or too few images weaken the model</td></tr>
+<tr><td>Camera quality</td><td>Low-resolution input affects detection and matching</td></tr>
+<tr><td>Controlled prototype setting</td><td>Results may not carry over to crowded, real-world rooms</td></tr>
+</table>
+<div class="callout"><b>Possible next steps (suggested, not part of the original project):</b> add a database in place of CSV files, test with a larger and more varied dataset, and add liveness detection to reduce spoofing with photos.</div>
+<h3>Final takeaway</h3>
+<p>The Face Recognition Attendance System is a practical use of AI and computer vision for a repetitive administrative task. By combining OpenCV, LBPH, Flask, and digital storage, it turns registration, recognition, and record keeping into a single workflow. The result is a working prototype that reduces manual effort in an everyday institutional process.</p>
+</section>
+ 
+<section id="questions">
+<h2>Developer Interview Questions</h2>
+<div class="qa">
+<div><h3>Face Recognition</h3><ul><li>Why was LBPH selected for this project?</li><li>How are facial images collected and labeled?</li><li>How does the system decide that a face matches a registered student?</li><li>What happens when an unknown face is detected?</li></ul></div>
+<div><h3>Attendance Logic</h3><ul><li>How is duplicate attendance prevented?</li><li>Which student details are stored with each entry?</li><li>How are frames with no detected face handled?</li></ul></div>
+<div><h3>Web and Backend</h3><ul><li>How does Flask communicate with the recognition code?</li><li>What happens when the admin starts capture, training, or attendance?</li><li>How are records stored and accessed?</li></ul></div>
+<div><h3>Testing</h3><ul><li>Which conditions were used to test recognition?</li><li>What were the main technical issues during implementation?</li><li>Which limitations appeared in real-time testing?</li></ul></div>
+</div>
+</section>
+ 
+</div></main>
+<footer>AI-Based Face Recognition Attendance System: Case Study</footer>
+</body>
+</html>
+ 
+
